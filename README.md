@@ -2,6 +2,11 @@
 
 Este projeto foi inicializado com [Create React App](https://github.com/facebook/create-react-app).
 
+![React](https://img.shields.io/badge/React-16.13.1-blue)
+![Node.js](https://img.shields.io/badge/Node.js-12.18.3-green)
+![npm](https://img.shields.io/badge/npm-6.14.6-red)
+![VS Code](https://img.shields.io/badge/VS%20Code-1.47.3-blue)
+
 ## Scripts Disponíveis
 
 No diretório do projeto, você pode executar:
