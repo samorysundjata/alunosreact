@@ -6,11 +6,19 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import logoCadastro from "./assets/cadastro.jpg";
+import logoCadastro from "./assets/cadastro.png";
 
 function App() {
-  const baseUrl = "http://localhost:7266/api/alunos";
+  const baseUrl = "https://localhost:7266/api/Alunos";
   const [data, setData] = useState([]);
+
+  const [alunoSelecionado, setAlunoSelecionado] = useState({
+    id: "",
+    nome: "",
+    email: "",
+    idade: "",
+  });
+
   const pedidoGet = async () => {
     await axios
       .get(baseUrl)
@@ -27,11 +35,11 @@ function App() {
   });
 
   return (
-    <div className="App">
+    <div className="aluno-container">
       <br />
       <h3>Cadastro de Alunos</h3>
       <header>
-        <image src={logoCadastro} alt="logoCadastro" />
+        <img src={logoCadastro} alt="Cadastro" />
         <button className="btn btn-success">Incluir Novo Aluno</button>
       </header>
       <table className="table table-bordered">
