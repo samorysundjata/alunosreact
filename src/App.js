@@ -1,6 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -9,11 +7,14 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import logoCadastro from "./assets/cadastro.png";
 
 function App() {
-  const baseUrl = "https://localhost:7266/api/Alunos";
+  const baseUrl = "https://localhost:7266/api/alunos";
 
   const [data, setData] = useState([]);
+  const [updateData, setUpdateData] = useState(true);
+
   const [modalIncluir, setModalIncluir] = useState(false);
   const [modalEditar, setModalEditar] = useState(false);
+  const [modalExcluir, setModalExcluir] = useState(false);
 
   const [alunoSelecionado, setAlunoSelecionado] = useState({
     id: "",
@@ -24,7 +25,7 @@ function App() {
 
   const selecionarAluno = (aluno, opcao) => {
     setAlunoSelecionado(aluno);
-    opcao === "Editar" && abrirFecharModalEditar();
+    opcao === "Editar" ? abrirFecharModalEditar() : abrirFecharModalExcluir();
   };
 
   const abrirFecharModalIncluir = () => {
@@ -33,6 +34,10 @@ function App() {
 
   const abrirFecharModalEditar = () => {
     setModalEditar(!modalEditar);
+  };
+
+  const abrirFecharModalExcluir = () => {
+    setModalExcluir(!modalExcluir);
   };
 
   const handleChange = (e) => {
@@ -62,6 +67,7 @@ function App() {
       .post(baseUrl, alunoSelecionado)
       .then((response) => {
         setData(data.concat(response.data));
+        setUpdateData(true);
         abrirFecharModalIncluir();
       })
       .catch((error) => {
@@ -83,6 +89,7 @@ function App() {
             aluno.idade = resposta.idade;
           }
         });
+        setUpdateData(true);
         abrirFecharModalEditar();
       })
       .catch((error) => {
@@ -90,9 +97,25 @@ function App() {
       });
   };
 
+  const pedidoDelete = async () => {
+    await axios
+      .delete(baseUrl + "/" + alunoSelecionado.id)
+      .then((response) => {
+        setData(data.filter((aluno) => aluno.id !== response.data));
+        setUpdateData(true);
+        abrirFecharModalExcluir();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   useEffect(() => {
-    pedidoGet();
-  });
+    if (updateData) {
+      pedidoGet();
+      setUpdateData(false);
+    }
+  }, [updateData]);
 
   return (
     <div className="aluno-container">
@@ -131,6 +154,7 @@ function App() {
                 >
                   Editar
                 </button>{" "}
+                {"  "}
                 <button
                   className="btn btn-danger"
                   onClick={() => selecionarAluno(aluno, "Excluir")}
@@ -142,8 +166,9 @@ function App() {
           ))}
         </tbody>
       </table>
+
       <Modal isOpen={modalIncluir}>
-        <ModalHeader>Inclur Aluno</ModalHeader>
+        <ModalHeader>Incluir Alunos</ModalHeader>
         <ModalBody>
           <div className="form-group">
             <label>Nome: </label>
@@ -179,7 +204,7 @@ function App() {
           <button className="btn btn-primary" onClick={() => pedidoPost()}>
             Incluir
           </button>
-          {""}
+          {"   "}
           <button
             className="btn btn-danger"
             onClick={() => abrirFecharModalIncluir()}
@@ -190,19 +215,18 @@ function App() {
       </Modal>
 
       <Modal isOpen={modalEditar}>
-        <ModalHeader>Editar Aluno</ModalHeader>
+        <ModalHeader>Editar Aluno</ModalHeader>
         <ModalBody>
           <div className="form-group">
-            <label>Id: </label>
-            <br />
+            <label>ID: </label>
             <input
-              text="text"
+              type="text"
               className="form-control"
               readOnly
               value={alunoSelecionado && alunoSelecionado.id}
             />
             <br />
-            <label>Nome: </label>
+            <label>Nome: </label>
             <br />
             <input
               type="text"
@@ -212,7 +236,7 @@ function App() {
               value={alunoSelecionado && alunoSelecionado.nome}
             />
             <br />
-            <label>Email: </label>
+            <label>Email: </label>
             <br />
             <input
               type="text"
@@ -222,7 +246,7 @@ function App() {
               value={alunoSelecionado && alunoSelecionado.email}
             />
             <br />
-            <label>Idade: </label>
+            <label>Idade: </label>
             <br />
             <input
               type="text"
@@ -238,12 +262,32 @@ function App() {
           <button className="btn btn-primary" onClick={() => pedidoPut()}>
             Editar
           </button>
-          {""}
+          {"  "}
           <button
             className="btn btn-danger"
             onClick={() => abrirFecharModalEditar()}
           >
             Cancelar
+          </button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={modalExcluir}>
+        <ModalBody>
+          Confirma a exclusão deste(a) aluno(a) : 
+          {alunoSelecionado && alunoSelecionado.nome} ?
+        </ModalBody>
+        <ModalFooter>
+          <button className="btn btn-danger" onClick={() => pedidoDelete()}>
+            {" "}
+            Sim{" "}
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => abrirFecharModalExcluir()}
+          >
+            {" "}
+            Não{" "}
           </button>
         </ModalFooter>
       </Modal>
